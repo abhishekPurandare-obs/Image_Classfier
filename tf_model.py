@@ -12,7 +12,6 @@ from tensorflow.keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers.normalization.batch_normalization import BatchNormalization
 
-
 mlflow.set_experiment(experiment_name="Sample experiment")
 
 hyperparams1 = Namespace(
@@ -166,13 +165,16 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
 
     signature = predict(classifier, get_signature=True)
     path = f"models/model_{model_no}_config_{config_idx}"
-    mlflow.tensorflow.autolog()
     mlflow.log_params(history.history)
     mlflow.log_param("learning_rate", config.learning_rate)
     mlflow.log_param("epochs", config.epochs)
     mlflow.log_param("time_taken", time_taken)
     mlflow.log_param("model_path", path)
-    mlflow.pyfunc.save_model(path=path, python_model=MyPredictModel(), signature=signature)
+    mlflow.tensorflow.autolog()
+    mlflow.keras.save_model(classifier,
+                            path,
+                            # python_model=loader_mod.MyPredictModel(path),
+                            signature=signature)
 
 
 def run_model(model_no=1, config_idx=0):

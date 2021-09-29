@@ -1,8 +1,9 @@
 import mlflow
 import mlflow.tensorflow
 from mlflow.tracking.client import MlflowClient
-import tf_model
+from tensorflow.keras.preprocessing import image
 import os
+import numpy as np
 
 client = MlflowClient()
 
@@ -37,7 +38,8 @@ def get_best_model_id(exp, metric_name="val_accuracy"):
             metrics[r_id] = {'val_accuracy': float(val_accuracy),
                             'val_loss': float(val_loss),
                             'model_path': model_path}
-        except:
+        except Exception as e:
+            print(e)
             print(f"Skipping {r_id}")
 
 
@@ -64,6 +66,13 @@ if __name__ == "__main__":
     exp = client.get_experiment_by_name("Sample experiment")
     print_exp_info(exp)
     best_run_id, best_run_metrics = get_best_model_id(exp)
-    # model = _load_pyfunc(best_run_metrics["model_path"])
+    model_path = best_run_metrics["model_path"]
+    print("MODEL: ", model_path)
 
-    serve_model(best_run_metrics["model_path"])
+    model = mlflow.pyfunc.load_model(model_path)
+    image_name = "dog.jpg"
+    test_image = image.load_img(image_name, target_size=(64,64))
+    test_image = image.img_to_array(test_image)
+    test_image = np.expand_dims(test_image, axis=0)
+    print(model.predict(test_image))
+    serve_model(model_path)

@@ -5,19 +5,15 @@ import click
 from tensorflow.keras.preprocessing import image
 import numpy as np
 
+def predict(result):
+    p = float(eval(result)[0][0])
+    return "Cat" if p < 0.5 else "Dog"
+
 @click.command()
 @click.option("--port", type=click.INT, default=5000)
 @click.option("--host", type=click.STRING, default="http://0.0.0.0")
 @click.option("--path", type=click.STRING, default="dog.jpg")
-def send(path, port, host):
-
-
-    # if os.path.isdir(path):
-    #     filenames = [
-    #         os.path.join(path, x) for x in os.listdir(path) if os.path.isfile(os.path.join(path, x))
-    #     ]
-    # else:
-    #     filenames = [path]
+def show_prediction(path, port, host):
 
     def convert_image(image_name):
         test_image = image.load_img(image_name, target_size=(64,64))
@@ -42,11 +38,9 @@ def send(path, port, host):
             )
         )
 
-    return response
+    print("Prediction: ", predict(response.text))
 
 
 if __name__ == "__main__":
 
-    res = send()
-    pred = "Cat" if float(res.text) < 0.5 else "Dog"
-    print("Output: ", pred)
+    show_prediction()
