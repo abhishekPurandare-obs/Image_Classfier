@@ -1,3 +1,4 @@
+import os
 import mlflow
 import mlflow.tensorflow
 from mlflow.models.signature import infer_signature
@@ -23,7 +24,7 @@ hyperparams1 = Namespace(
     max_pool2_size=(2, 2),
     dense_layer1_size=128,
     dense_layer2_size=16,
-    epochs=1
+    epochs=10
 )
 
 hyperparams2 = Namespace(
@@ -35,7 +36,7 @@ hyperparams2 = Namespace(
     dense_layer1_size=256,
     dense_layer2_size=32,
     learning_rate=0.01,
-    epochs=1
+    epochs=10
 )
 
 CONFIG = [hyperparams1, hyperparams2]
@@ -103,11 +104,6 @@ def get_model_2(config_idx=0):
 
 
 def data_augmenter(config_idx=0):
-    #Data augumentation - since neural net is not smart, even slight difference in images
-    #shall be considered as seperate images thus to increase our training set size we shall
-    # provide slight changes to images
-
-    #part 2 - Fitting the CNN to the images
 
     config = CONFIG[config_idx]
 
@@ -150,7 +146,8 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     
 
     config = CONFIG[config_idx]
-    
+    model_path = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
+    print("Saving model at ", model_path)
     st = datetime.datetime.now()
     history = classifier.fit(
             training_set,
@@ -164,15 +161,14 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     time_taken = (end - st).seconds
 
     signature = predict(classifier, get_signature=True)
-    path = f"models/model_{model_no}_config_{config_idx}"
     mlflow.log_params(history.history)
     mlflow.log_param("learning_rate", config.learning_rate)
     mlflow.log_param("epochs", config.epochs)
     mlflow.log_param("time_taken", time_taken)
-    mlflow.log_param("model_path", path)
+    mlflow.log_param("model_path", model_path)
     mlflow.tensorflow.autolog()
     mlflow.keras.save_model(classifier,
-                            path,
+                            model_path,
                             # python_model=loader_mod.MyPredictModel(path),
                             signature=signature)
 
@@ -203,5 +199,4 @@ if __name__ == "__main__":
     for model_no in range(1, 3):
         for config_idx in range(len(CONFIG)):
             run_model(model_no, config_idx)
-
     

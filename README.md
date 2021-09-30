@@ -1,2 +1,2 @@
-# Image_Classfier
-Basic Image Classifier - 2 Layer Neural Network  built using TensorFlow and Keras API , distinguishes between Dog and Cat images using a dataset of 4000 images at Kaggle
+# Image_Classfier and MLFlow
+This is a basic image classifer to try out Machine learning life cycle using MLFlow.
