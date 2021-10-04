@@ -1,10 +1,12 @@
-import os
 import mlflow
 import mlflow.tensorflow
 from mlflow.models.signature import infer_signature
+
+import os
 from argparse import Namespace
 import datetime
 import numpy as np
+
 import tensorflow
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -13,8 +15,16 @@ from tensorflow.keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers.normalization.batch_normalization import BatchNormalization
 
-mlflow.set_experiment(experiment_name="Sample experiment")
 
+if not tensorflow.test.is_gpu_available(cuda_only=True):
+    os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
+#setting experiment name
+#Keep the same name in all of the files to save runs under the same experiment.
+# exp_name = "Sample Experiment"
+EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
+# mlflow.set_experiment(experiment_name=exp_name)
+
+#For this sample code, I am using each set of hyperparameters on two different models.
 hyperparams1 = Namespace(
     batch_size = 32,
     conv1_feature_maps=64,
@@ -41,8 +51,9 @@ hyperparams2 = Namespace(
 
 CONFIG = [hyperparams1, hyperparams2]
 
-
-
+#Keeping a custom callback for keras.
+#Not used here though since I am only logging parameters after fitting the model.
+#You can add mlflow params as per your requirements.
 class CustomCallback(tensorflow.keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
@@ -102,7 +113,7 @@ def get_model_2(config_idx=0):
     
     return (classifier, "Model 2")
 
-
+#performs image augmentation on the given datasets
 def data_augmenter(config_idx=0):
 
     config = CONFIG[config_idx]
@@ -125,7 +136,7 @@ def data_augmenter(config_idx=0):
                                             class_mode='binary')
     return (training_set, test_set)
 
-
+#This is a predict code for testing the model locally.
 def predict(classifier, PATH="dog.jpg", get_signature=False):
     
     test_image = image.load_img(PATH,target_size=(64,64))
@@ -139,6 +150,10 @@ def predict(classifier, PATH="dog.jpg", get_signature=False):
         prediction='cat'
     print(f"\n\nPrediction: {prediction}")
 
+    #signature is used by mlflow to identify input and output types of the model
+    #This information will be stored along with the model.
+    #When loading the model for running or serving. The I/O for the model will be enforced
+    #based on the following saved types.
     if get_signature:
         return infer_signature(model_input=test_image, model_output=result)
 
@@ -146,6 +161,8 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     
 
     config = CONFIG[config_idx]
+
+    #saving the model name based on timestamp value
     model_path = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
     print("Saving model at ", model_path)
     st = datetime.datetime.now()
@@ -161,19 +178,25 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     time_taken = (end - st).seconds
 
     signature = predict(classifier, get_signature=True)
+    
+    #History contains both losses and accuracies.
     mlflow.log_params(history.history)
+    #Additional information to log
     mlflow.log_param("learning_rate", config.learning_rate)
     mlflow.log_param("epochs", config.epochs)
     mlflow.log_param("time_taken", time_taken)
     mlflow.log_param("model_path", model_path)
+    #autolog method will save most of the important parameters for the model
     mlflow.tensorflow.autolog()
+    #Save the model under keras
+    #Check documentation for different types of APIs depending on the library.
     mlflow.keras.save_model(classifier,
                             model_path,
                             # python_model=loader_mod.MyPredictModel(path),
                             signature=signature)
 
 
-def run_model(model_no=1, config_idx=0):
+def run(model_no=1, config_idx=0):
 
     training_set, test_set = data_augmenter()
 
@@ -185,18 +208,24 @@ def run_model(model_no=1, config_idx=0):
     print(model_name)
     print(classifier.summary())
 
-    exp_name = f"Experiment: Pet Classifier MODEL {model_no} CONFIG {config_idx}"
-    with mlflow.start_run(run_name=exp_name) as run:
+    run_name = f"Experiment: Pet Classifier MODEL {model_no} CONFIG {config_idx}"
+    #For each run setup in the following manner to let mlflow know when you
+    #train the model.
+    
+    with mlflow.start_run(run_name=run_name) as run:
 
         run_id = run.info.run_uuid
         exp_id = run.info.experiment_id
         print(f"*****Running Run {run_id} Experiment {exp_id}*****")
-        mlflow.log_param("Experiment Name", exp_name)
+        mlflow.log_param("Experiment Name", run_name)
         train(classifier, training_set, test_set, model_no, config_idx)
 
 if __name__ == "__main__":
+    
+    #Running both models on both configurations.
+    # for model_no in range(1, 3):
+        # for config_idx in range(len(CONFIG)):
+    # run_model(model_no, config_idx)
 
-    for model_no in range(1, 3):
-        for config_idx in range(len(CONFIG)):
-            run_model(model_no, config_idx)
+    run()
     

@@ -62,8 +62,9 @@ def serve_model(model_path, port=5000, host="0.0.0.0"):
     os.system(command)
 
 if __name__ == "__main__":
-
-    exp = client.get_experiment_by_name("Sample experiment")
+    
+    exp_name = os.environ["MLFLOW_EXP_NAME"]
+    exp = client.get_experiment_by_name(exp_name)
     print_exp_info(exp)
     best_run_id, best_run_metrics = get_best_model_id(exp)
     model_path = best_run_metrics["model_path"]

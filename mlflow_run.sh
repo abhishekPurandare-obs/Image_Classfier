@@ -1,0 +1,1 @@
+mlflow run --experiment-name "Sample Experiment" --docker-args env-file=project.env . --no-conda
