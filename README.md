@@ -1,5 +1,5 @@
-# Image_Classfier and MLFlow
-This is a basic Pet classifer used for testing ML life cycle tracking and serving using MLflow.
+# Image Classifier and MLFlow
+This is a basic Pet classifier used for testing ML life cycle tracking and serving using MLflow.
 
 ## To serve the best model
 ```python serve_model.py```
