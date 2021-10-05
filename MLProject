@@ -1,12 +1,12 @@
 name: mlflow-test-project
 
-# docker_env:
-#     image: mlflow_image:latest
-#     # environment: [["MLFLOW_EXP_NAME", "Sample Experiment"]]
+docker_env:
+    image: mlflow_image:latest
+    volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
 
 entry_points:
     main:
-        command: source project.env
+        # command: source project.env
         parameters:
             model: {type:string, default: "1"}
             config: {type:string, default: "0"}

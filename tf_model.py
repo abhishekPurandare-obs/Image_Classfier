@@ -34,7 +34,7 @@ hyperparams1 = Namespace(
     max_pool2_size=(2, 2),
     dense_layer1_size=128,
     dense_layer2_size=16,
-    epochs=10
+    epochs=1
 )
 
 hyperparams2 = Namespace(
@@ -46,7 +46,7 @@ hyperparams2 = Namespace(
     dense_layer1_size=256,
     dense_layer2_size=32,
     learning_rate=0.01,
-    epochs=10
+    epochs=1
 )
 
 CONFIG = [hyperparams1, hyperparams2]
@@ -163,8 +163,7 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     config = CONFIG[config_idx]
 
     #saving the model name based on timestamp value
-    m = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
-    model_path = os.path.join(os.path.abspath("."), m)
+    model_path = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
     print("Saving model at ", model_path)
     st = datetime.datetime.now()
     history = classifier.fit(
@@ -181,7 +180,9 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     signature = predict(classifier, get_signature=True)
     
     #History contains both losses and accuracies.
-    mlflow.log_params(history.history)
+    #Returns a list of metrics so only saving the metrics of the last epoch
+    for metric in ["loss", "accuracy", "val_loss", "val_accuracy"]:
+        mlflow.log_metric(metric, history.history[metric][-1])
     #Additional information to log
     mlflow.log_param("learning_rate", config.learning_rate)
     mlflow.log_param("epochs", config.epochs)

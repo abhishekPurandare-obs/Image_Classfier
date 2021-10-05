@@ -30,18 +30,16 @@ def get_best_model_id(exp, metric_name="val_accuracy"):
     metrics = {}
     for r_id in run_ids:
         try:
-            params = client.get_run(r_id).data.params
-            val_accuracy = eval(params['val_accuracy'])[-1]
-            val_loss = eval(params['val_loss'])[-1]
-            model_path = params["model_path"]
-            # model_path = os.path.join(params['model_path'], "python_model.pkl")
+            metrics_dict = client.get_run(r_id).data.metrics
+            val_accuracy = metrics_dict['val_accuracy']
+            val_loss = metrics_dict['val_loss']
+            model_path = client.get_run(r_id).data.params["model_path"]
             metrics[r_id] = {'val_accuracy': float(val_accuracy),
                             'val_loss': float(val_loss),
                             'model_path': model_path}
         except Exception as e:
             print(e)
             print(f"Skipping {r_id}")
-
 
     for r_id, metric in metrics.items():
         m = metric[metric_name]
