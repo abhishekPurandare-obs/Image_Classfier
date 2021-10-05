@@ -12,4 +12,6 @@ by default model takes request at ```<host>:<port>/invocations```
 ```docker build -t mlflow_image .```
 
 ## To run an experiment
-```mlflow run --experiment-name Sample_Experiment --docker-args env-file=project.env . --no-conda --param-list model=1 config=0```
+```mlflow run --experiment-name Sample_Experiment . --no-conda --param-list model=1 config=0```
+
+Facing some issues while running with docker as model is not getting saved inside the container.
