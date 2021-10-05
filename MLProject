@@ -1,8 +1,8 @@
 name: mlflow-test-project
 
-docker_env:
-    image: mlflow_image:latest
-    # environment: [["MLFLOW_EXP_NAME", "Sample Experiment"]]
+# docker_env:
+#     image: mlflow_image:latest
+#     # environment: [["MLFLOW_EXP_NAME", "Sample Experiment"]]
 
 entry_points:
     main:

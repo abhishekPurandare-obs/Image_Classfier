@@ -1,7 +1,7 @@
 # Image Classifier and MLFlow
 This is a basic Pet classifier used for testing ML life cycle tracking and serving using MLflow.
 
-## To serve the best model
+## To serve the best model based on val_accuracy
 ```python serve_model.py```
 by default model takes request at ```<host>:<port>/invocations```
 
@@ -12,4 +12,4 @@ by default model takes request at ```<host>:<port>/invocations```
 ```docker build -t mlflow_image .```
 
 ## To run an experiment
-```mlflow run --experiment-name "Sample Experiment" ---docker-args env-file=project.env . --no-conda --param-list model=1 config=0```
+```mlflow run --experiment-name Sample_Experiment --docker-args env-file=project.env . --no-conda --param-list model=1 config=0```

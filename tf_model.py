@@ -20,8 +20,8 @@ if not tensorflow.test.is_gpu_available(cuda_only=True):
     os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
 #setting experiment name
 #Keep the same name in all of the files to save runs under the same experiment.
-# exp_name = "Sample Experiment"
-EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
+EXP_NAME = "Sample_Experiment"
+# EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
 # mlflow.set_experiment(experiment_name=exp_name)
 
 #For this sample code, I am using each set of hyperparameters on two different models.
@@ -163,7 +163,8 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
     config = CONFIG[config_idx]
 
     #saving the model name based on timestamp value
-    model_path = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
+    m = "models/{:%d-%b-%y_%H-%M-%S}".format(datetime.datetime.now())
+    model_path = os.path.join(os.path.abspath("."), m)
     print("Saving model at ", model_path)
     st = datetime.datetime.now()
     history = classifier.fit(
