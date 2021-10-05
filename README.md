@@ -28,8 +28,9 @@ By default, wherever you run your program, the tracking API writes data into a l
 
 We can also serve the model using a container by executing the following command
 
-```mlflow models build-docker -m "path/to/model" -n "image-name"
-docker run -t "image-name" -p 5000:8080```
+```mlflow models build-docker -m "path/to/model" -n "image-name"```
+
+```docker run -t "image-name" -p 5000:8080```
 
 I haven't tried this yet because the endpoint of the API created by mlflow takes a specific input [Here](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlmodel-configuration)
 
