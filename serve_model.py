@@ -59,6 +59,21 @@ def serve_model(model_path, port=5000, host="0.0.0.0"):
     command = f"sh serve.sh {model_path} {port} {host}"
     os.system(command)
 
+
+def run_docker():
+    pass
+
+def run_local(model_path):
+    model = mlflow.pyfunc.load_model(model_path)
+    image_name = "dog.jpg"
+    test_image = image.load_img(image_name, target_size=(64,64))
+    test_image = image.img_to_array(test_image)
+    test_image = np.expand_dims(test_image, axis=0)
+    print(model.predict(test_image))
+    serve_model(model_path)
+def run():
+    pass
+
 if __name__ == "__main__":
     
     # exp_name = os.environ["MLFLOW_EXP_NAME"]
@@ -69,10 +84,5 @@ if __name__ == "__main__":
     model_path = best_run_metrics["model_path"]
     print("MODEL: ", model_path)
 
-    model = mlflow.pyfunc.load_model(model_path)
-    image_name = "dog.jpg"
-    test_image = image.load_img(image_name, target_size=(64,64))
-    test_image = image.img_to_array(test_image)
-    test_image = np.expand_dims(test_image, axis=0)
-    print(model.predict(test_image))
-    serve_model(model_path)
+    run_local(model_path)
+
