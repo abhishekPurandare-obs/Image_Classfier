@@ -12,6 +12,13 @@ since the image has to be created beforehand to setup our environment. But we ca
 ## To run an experiment
 ```mlflow run --experiment-name Sample_Experiment . --no-conda --param-list model=1 config=0```
 
+You can also make a run by specifying git repo
+```mlflow run https://github.com/abhishekPurandare-obs/mlflow_test.git --no-conda -P  model=1 -P config=0```
+
+```mlflow run``` looks for ```MLProject``` to configure environment for your current run.
+
+
+
 ## To serve the best model based on val_accuracy
 ```python serve_model.py```
 by default model takes a request at ```<host>:<port>/invocations```
@@ -34,4 +41,4 @@ We can also serve the model using a container by executing the following command
 
 I haven't tried this yet because the endpoint of the API created by mlflow takes a specific input [Here](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlmodel-configuration)
 
-In this example, I am first preprocessing the image in send_request.py to make it compatible with the expected input by the endpoint. But there is a way to create a custom predict function for specific use-case too. So that way, we can send any type of image. That will be passed to your custom predict routine and then make a prediction.
+In this example, I am first preprocessing the image in [send_request.py](send_request.py) to make it compatible with the expected input by the endpoint. But there is a way to create a custom predict function for specific use-case too. So that way, we can send any type of image. That will be passed to your custom predict routine and then make a prediction.
