@@ -41,4 +41,4 @@ We can also serve the model using a container by executing the following command
 
 I haven't tried this yet because the endpoint of the API created by mlflow takes a specific input [Here](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlmodel-configuration)
 
-In this example, I am first preprocessing the image in [send_request.py](send_request.py) to make it compatible with the expected input by the endpoint. But there is a way to create a custom predict function for specific use-case too. So that way, we can send any type of image. That will be passed to your custom predict routine and then make a prediction.
+In this example, I am first preprocessing the image in [send_request.py](send_request.py) to make it compatible with the expected input by the endpoint. But there is a way to create a custom predict function for specific use-case too. So that way, we can send any type of image. That will be passed to your custom predict routine and then make a prediction. [Question](https://stackoverflow.com/questions/69450237/how-to-send-a-raw-input-image-to-an-mlflow-served-endpoint-for-a-cnn-model)
