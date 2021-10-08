@@ -22,7 +22,11 @@ if not tensorflow.test.is_gpu_available(cuda_only=True):
 #Keep the same name in all of the files to save runs under the same experiment.
 EXP_NAME = "Sample_Experiment"
 # EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
-# mlflow.set_experiment(experiment_name=exp_name)
+try:
+    mlflow.create_experiment(EXP_NAME)
+except Exception as e:
+    print(e)
+    mlflow.set_experiment(EXP_NAME)
 
 #For this sample code, I am using each set of hyperparameters on two different models.
 hyperparams1 = Namespace(

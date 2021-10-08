@@ -2,3 +2,5 @@ __pycache__
 models
 dataset
 mlruns
+aws.env
+project.env

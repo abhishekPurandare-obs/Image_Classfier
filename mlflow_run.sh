@@ -1,2 +1,5 @@
-# --docker-args env-file=project.env
-mlflow run --experiment-name Sample_Experiment . --no-conda
+mlflow run \
+    --docker-args env-file=project.env \
+    --docker-args network="host" \
+    --experiment-name Sample_Experiment \
+    --no-conda . 

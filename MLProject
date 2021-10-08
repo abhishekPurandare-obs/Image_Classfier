@@ -1,7 +1,7 @@
 name: mlflow-test-project
 
 docker_env:
-    image: mlflow_image:latest
+    image: mlflow-image:latest
     volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
 
 entry_points:

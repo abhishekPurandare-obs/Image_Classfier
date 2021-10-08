@@ -1,4 +1,4 @@
-# .gitignore
-# __pycache__
-# mlruns
-# models
+.gitignore
+__pycache__
+mlruns
+models
