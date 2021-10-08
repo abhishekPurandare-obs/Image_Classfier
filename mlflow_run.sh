@@ -1,5 +1,7 @@
+#!/bin/bash
+
+bash exp_env.sh
 mlflow run \
-    --docker-args env-file=project.env \
-    --docker-args network="host" \
-    --experiment-name Sample_Experiment \
-    --no-conda . 
+--docker-args env-file=project.env \
+--experiment-name ${MLFLOW_EXP_NAME} \
+--no-conda .

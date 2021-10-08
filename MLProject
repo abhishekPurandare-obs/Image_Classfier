@@ -2,11 +2,11 @@ name: mlflow-test-project
 
 docker_env:
     image: mlflow-image:latest
-    volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
+    # volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
+    environment: [["MLFLOW_TRACKING_URI", "http://192.168.0.109:5000/"]]
 
 entry_points:
     main:
-        # command: source project.env
         parameters:
             model: {type:string, default: "1"}
             config: {type:string, default: "0"}

@@ -4,3 +4,4 @@ dataset
 mlruns
 aws.env
 project.env
+exp_env.sh

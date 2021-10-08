@@ -1,6 +1,7 @@
 import mlflow
 import mlflow.tensorflow
 from mlflow.models.signature import infer_signature
+from mlflow.tracking import MlflowClient
 
 import os
 from argparse import Namespace
@@ -20,13 +21,15 @@ if not tensorflow.test.is_gpu_available(cuda_only=True):
     os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
 #setting experiment name
 #Keep the same name in all of the files to save runs under the same experiment.
-EXP_NAME = "Sample_Experiment"
+EXP_NAME = "Experiment-abhishek"
 # EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
-try:
-    mlflow.create_experiment(EXP_NAME)
-except Exception as e:
-    print(e)
-    mlflow.set_experiment(EXP_NAME)
+# try:
+#     EXP_ID = mlflow.create_experiment(EXP_NAME)
+# except Exception as e:
+#     print(e)
+mlflow.set_experiment(EXP_NAME)
+
+client = MlflowClient()
 
 #For this sample code, I am using each set of hyperparameters on two different models.
 hyperparams1 = Namespace(
@@ -201,6 +204,12 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
                             # python_model=loader_mod.MyPredictModel(path),
                             signature=signature)
 
+def show_exp_details(exp_name):
+    experiment = mlflow.get_experiment_by_name(exp_name)
+    print("Experiment_id: {}".format(experiment.experiment_id))
+    print("Artifact Location: {}".format(experiment.artifact_location))
+    print("Tags: {}".format(experiment.tags))
+    print("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
 
 def run(model_no=1, config_idx=0):
 
@@ -213,25 +222,33 @@ def run(model_no=1, config_idx=0):
 
     print(model_name)
     print(classifier.summary())
+    print("Active run: {}".format(mlflow.active_run()))
 
     run_name = f"Experiment: Pet Classifier MODEL {model_no} CONFIG {config_idx}"
+
+    exp_id = mlflow.get_experiment_by_name(EXP_NAME).experiment_id
+    run = client.create_run(exp_id)
+    run_id = run.info.run_uuid
+    
+
+
     #For each run setup in the following manner to let mlflow know when you
     #train the model.
-    
-    with mlflow.start_run(run_name=run_name) as run:
+    show_exp_details(EXP_NAME)
+    print(f"TRACKING URI:{mlflow.get_tracking_uri()}\n\n\n")
 
-        run_id = run.info.run_uuid
-        exp_id = run.info.experiment_id
-        print(f"*****Running Run {run_id} Experiment {exp_id}*****")
+    with mlflow.start_run(experiment_id=exp_id, run_id=run_id, run_name=run_name) as run:
+    # with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_param("Experiment Name", run_name)
         train(classifier, training_set, test_set, model_no, config_idx)
+    mlflow.end_run()
 
 if __name__ == "__main__":
     
     #Running both models on both configurations.
     # for model_no in range(1, 3):
         # for config_idx in range(len(CONFIG)):
-    # run_model(model_no, config_idx)
+    #       run(model_no, config_idx)
 
     run()
     
