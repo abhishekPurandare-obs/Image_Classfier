@@ -3,7 +3,7 @@ name: mlflow-test-project
 docker_env:
     image: mlflow-image:latest
     # volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
-    environment: [["MLFLOW_TRACKING_URI", "http://192.168.0.109:5000/"]]
+    environment: [["MLFLOW_TRACKING_URI", "http://ec2-13-232-139-2.ap-south-1.compute.amazonaws.com:5000/"]]
 
 entry_points:
     main:

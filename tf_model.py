@@ -229,6 +229,7 @@ def run(model_no=1, config_idx=0):
     exp_id = mlflow.get_experiment_by_name(EXP_NAME).experiment_id
     run = client.create_run(exp_id)
     run_id = run.info.run_uuid
+    client.set_tag(run_id=run_id, key="mlflow.runName", value=run_name)
     
 
 
@@ -236,7 +237,6 @@ def run(model_no=1, config_idx=0):
     #train the model.
     show_exp_details(EXP_NAME)
     print(f"TRACKING URI:{mlflow.get_tracking_uri()}\n\n\n")
-
     with mlflow.start_run(experiment_id=exp_id, run_id=run_id, run_name=run_name) as run:
     # with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_param("Experiment Name", run_name)
