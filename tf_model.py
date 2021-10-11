@@ -16,7 +16,7 @@ from tensorflow.keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers.normalization.batch_normalization import BatchNormalization
 
-import upload_models as um
+import s3_transfer
 
 if not tensorflow.test.is_gpu_available(cuda_only=True):
     os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
@@ -205,7 +205,7 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
                             # python_model=loader_mod.MyPredictModel(path),
                             signature=signature)
 
-    um.save_to_s3(model_path)
+    s3_transfer.save(model_path)
 
 def show_exp_details(exp_name):
     experiment = mlflow.get_experiment_by_name(exp_name)
