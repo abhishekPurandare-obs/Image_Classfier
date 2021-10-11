@@ -22,13 +22,13 @@ if not tensorflow.test.is_gpu_available(cuda_only=True):
     os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
 #setting experiment name
 #Keep the same name in all of the files to save runs under the same experiment.
-EXP_NAME = "Experiment-abhishek"
+# EXP_NAME = "Experiment-abhishek"
 # EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
 # try:
 #     EXP_ID = mlflow.create_experiment(EXP_NAME)
 # except Exception as e:
 #     print(e)
-mlflow.set_experiment(EXP_NAME)
+# mlflow.set_experiment(EXP_NAME)
 
 client = MlflowClient()
 
@@ -205,8 +205,10 @@ def train(classifier, training_set, test_set, model_no=1, config_idx=0):
                             # python_model=loader_mod.MyPredictModel(path),
                             signature=signature)
 
-    s3_transfer.save(model_path)
-
+    # s3_transfer.save(model_path)
+    # artifact_path = os.path.join("s3://"+os.environ['BUCKET']+"/artifacts", model_path)
+    mlflow.log_artifacts(model_path)
+    
 def show_exp_details(exp_name):
     experiment = mlflow.get_experiment_by_name(exp_name)
     print("Experiment_id: {}".format(experiment.experiment_id))
@@ -214,7 +216,7 @@ def show_exp_details(exp_name):
     print("Tags: {}".format(experiment.tags))
     print("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
 
-def run(model_no=1, config_idx=0):
+def run(exp_name, model_no=1, config_idx=0):
 
     training_set, test_set = data_augmenter()
 
@@ -229,28 +231,25 @@ def run(model_no=1, config_idx=0):
 
     run_name = f"Experiment: Pet Classifier MODEL {model_no} CONFIG {config_idx}"
 
-    exp_id = mlflow.get_experiment_by_name(EXP_NAME).experiment_id
+    exp_id = mlflow.get_experiment_by_name(exp_name).experiment_id
     run = client.create_run(exp_id)
     run_id = run.info.run_uuid
     client.set_tag(run_id=run_id, key="mlflow.runName", value=run_name)
-    
-
 
     #For each run setup in the following manner to let mlflow know when you
     #train the model.
-    show_exp_details(EXP_NAME)
+    show_exp_details(exp_name)
     print(f"TRACKING URI:{mlflow.get_tracking_uri()}\n\n\n")
     with mlflow.start_run(experiment_id=exp_id, run_id=run_id, run_name=run_name) as run:
-    # with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_param("Experiment Name", run_name)
         train(classifier, training_set, test_set, model_no, config_idx)
     mlflow.end_run()
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
     #Running both models on both configurations.
     # for model_no in range(1, 3):
         # for config_idx in range(len(CONFIG)):
     #       run(model_no, config_idx)
-    run()
+    # run()
     
