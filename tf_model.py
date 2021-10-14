@@ -16,19 +16,8 @@ from tensorflow.keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.keras.layers.normalization.batch_normalization import BatchNormalization
 
-import s3_transfer
-
 if not tensorflow.test.is_gpu_available(cuda_only=True):
     os.environ["CUDA_VISIBLE_DEVICE"] = '-1'
-#setting experiment name
-#Keep the same name in all of the files to save runs under the same experiment.
-# EXP_NAME = "Experiment-abhishek"
-# EXP_NAME = os.environ["MLFLOW_EXP_NAME"]
-# try:
-#     EXP_ID = mlflow.create_experiment(EXP_NAME)
-# except Exception as e:
-#     print(e)
-# mlflow.set_experiment(EXP_NAME)
 
 client = MlflowClient()
 

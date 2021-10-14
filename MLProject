@@ -2,12 +2,16 @@ name: mlflow-test-project
 
 docker_env:
     image: mlflow-image:latest
-    # volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
+    volumes: ["`pwd`/models/:/mlflow/projects/code/models/"]
     environment: [["MLFLOW_TRACKING_URI", "http://ec2-13-232-139-2.ap-south-1.compute.amazonaws.com:5000/"]]
 
 entry_points:
     main:
         parameters:
+            tracking_uri: {type:string, default: "http://ec2-13-232-139-2.ap-south-1.compute.amazonaws.com:5000/"}
+            experiment_name: {type:string, default: "Experiment-abhishek"}
             model: {type:string, default: "1"}
             config: {type:string, default: "0"}
-        command: python3 run.py --model {model} --config {config}
+        # command: python3 run.py --tracking-uri {tracking_uri} --experiment-name {experiment_name} --model {model} --config {config}
+        # command: ./train {tracking_uri} {experiment_name} {model} {config}
+        command: ./train --tracking-uri {tracking_uri} --experiment-name {experiment_name} --model {model} --config {config}
