@@ -5,3 +5,7 @@ mlruns
 aws.env
 project.env
 exp_env.sh
+lambda/*
+!lambda/requirements.txt
+!lambda/lambda_function.py
+*.zip

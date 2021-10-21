@@ -39,7 +39,8 @@ def send_sagemaker(sm_endpoint, data):
 
     region = os.environ['AWS_DEFAULT_REGION']
     sm = boto3.client('sagemaker', region_name=region)
-    smrt = boto3.client('runtime.sagemaker', region_name=region)
+    # smrt = boto3.client('runtime.sagemaker', region_name=region)
+    smrt = boto3.client("sagemaker-runtime", region_name=region)
 
     # Check endpoint status
     endpoint = sm.describe_endpoint(EndpointName=sm_endpoint)
@@ -72,6 +73,7 @@ def show_prediction(path, port, host, sm_endpoint):
 
     prediction = send_sagemaker(sm_endpoint, data)
     print("Prediction: ", predict(prediction))
+    
 
 
 
