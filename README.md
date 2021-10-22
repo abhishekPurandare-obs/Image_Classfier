@@ -5,10 +5,10 @@ In this section, we will cover how to train the model and create an endpoint usi
 
 # Contents
 
-1. [Setting up the tracking server on EC2](# 1. Setting up the tracking server on EC2)
-2. Packaging the source code for training on sagemaker
-3. Training your model on sagemaker
-4. Creating an endpoint using MLflow sagemaker API
+1. [Setting up the tracking server on EC2](#1-setting-up-the-tracking-server-on-ec2)
+2. [Packaging the source code for training on sagemaker](#2-containerizing-the-source-code-for-training-on-sagemaker)
+3. [Training your model on sagemaker](#3-training-your-model-on-sagemaker)
+4. [Creating an endpoint using MLflow sagemaker API](#4-creating-an-endpoint-using-mlflow-sagemaker-api)
 
 ## 1. Setting up the tracking server on EC2
 
@@ -79,5 +79,32 @@ First create a repository, in your ECS repositories. from there you click on `vi
 
 ## 3. Training your model on sagemaker
 
+1. Go to AWS SageMaker dashboard and create a notebook instance
+    - select `ml.t2.medium` for your notebook instance. Other instances will be more costly.
+    - Setup an existing execution role for the notebook. Make sure you have provided S3 as well as ECR access to this role. Otherwise sagemaker won't be able to pull the image or store its artifacts to S3.
+    - If needed, set up your VPC, subnets and security groups.
+    - If needed, set up a git repository that will be pulled in the same notebook instance. I haven't done this because our code is already inside the container. You can use this if you are going to use existing containers to run a custom script.
+    - This step will take some time.
+2. Create a notebook with your preffered environment. I chose `conda_tensorflow2_p36`.
+3. Refer to [mlflow-train-deploy.ipynb](mlflow-train-deploy.ipynb) to see how the model is trained.
+    - Specify your image uri which is stored in ECR
+    - Specify your hyperparameters. These values are passed to your training script as command line arguments.
+    - Specify output path. This is used by the sagemaker to save your model as tar file. Although we won't be needing it, this argument is mandatory.
+    - Specify your execution role. You can either get existing role by calling `sagemaker.Session.get_execution_role()` or just specify arn to your role from IAM.
+    - I have created two sets of parameters for training. One is `local` mode where the training will happen on the notebook instance itself. It would be a good practice to test your estimator fit using this mode to make sure everything is working as expected.
+
+    - In second set of parameters, I have specified `ml.m4.xlarge` as well as other parameters such as 
+    ```
+    'use_spot_instances': True,
+    'max_run': 500,
+    'max_wait': 600
+    ``` 
+
+    explain these
+
+    - You simply call fit method on your estimator.
+
+
+Now in my case. I copied my dataset inside a container since it wasn't too big. But a good practice would be to store the dataset in a bucket and pass your train and test paths to your training script. The `estimator.fit()` in the notebook can take these paths as inputs.
 
 ## 4. Creating an endpoint using MLflow sagemaker API
