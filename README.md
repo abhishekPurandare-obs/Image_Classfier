@@ -3,13 +3,14 @@ In the master branch. We created a simple experiment that we can run from any sy
 In this section, we will cover how to train the model and create an endpoint using AWS SageMaker.
 
 
-Contents
+# Contents
 
-1. Setting up the tracking server on EC2
+1. [Setting up the tracking server on EC2](# 1. Setting up the tracking server on EC2)
 2. Packaging the source code for training on sagemaker
-3. Creating an endpoint using MLflow sagemaker API
+3. Training your model on sagemaker
+4. Creating an endpoint using MLflow sagemaker API
 
-# 1. Setting up the tracking server on EC2
+## 1. Setting up the tracking server on EC2
 
 In our local runs, by default the MLflow tracking server runs on http://0.0.0.0:5000/ and artifacts are saved in project's root directory.
 
@@ -33,7 +34,7 @@ Now test your server out locally by running `mlflow run` command that will parse
 
 
 
-# 2. Containerizing the source code for training on sagemaker
+## 2. Containerizing the source code for training on sagemaker
 
 AWS Sagemaker is a well-equipped tool when it comes to end-to-end machine learning. Most often ML engineers will be using Sagemaker's Built-in Algorithms on their custom datasets. But SageMaker also provides us a way to bring our own model. To execute our custom training scripts, SageMaker provides us a script mode where we can train our model in a container. Frameworks such as TensorFlow, PyTorch, MXNet, etc. are provided in these containers. But sometimes we may need additional dependencies which may not be available like mlflow, for instance. Therefore we bring in our own container.
 
@@ -73,3 +74,10 @@ Now that our Dockerfile is set, all we need to do is build and push our image to
 
 
 First create a repository, in your ECS repositories. from there you click on `view push commands` and see how to push the image or you can just set up [this](https://github.com/aws/amazon-sagemaker-examples/blob/master/advanced_functionality/scikit_bring_your_own/container/build_and_push.sh) script.
+
+
+
+## 3. Training your model on sagemaker
+
+
+## 4. Creating an endpoint using MLflow sagemaker API
