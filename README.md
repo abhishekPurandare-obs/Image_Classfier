@@ -13,7 +13,7 @@ In this section, we will cover how to train the model and create an endpoint usi
 
 In our local runs, by default, the MLflow tracking server runs on http://0.0.0.0:5000/, and artifacts are saved in the project's root directory.
 
-When tracking our experiments we need to host this tracking server publicly. Each run will create a set of artifacts like files, model weights, etc as well as metrics and logs. To store all metrics and logs, mlflow allows us to use a database and to store artifacts, an S3 bucket.
+When tracking our experiments we need to host this tracking server publicly. Each run will create a set of artifacts like files, model weights, etc as well as metrics and logs. To store all metrics and logs, MLflow allows us to use a database and to store artifacts, an S3 bucket.
 
 I won't go into detail on how to set this up. But simply create an S3 bucket and a Database in AWS RDS. In this case, I've used PostgreSQL. Once that's done refer to [project.env](project.env) file where I've set up Database credentials and the bucket name. Make sure you create an S3 bucket with Read/Write access.
 
@@ -29,13 +29,13 @@ Next, it's time to set up our server on EC2. For this, we won't be needing a hig
 
 If you are unable to load the page, it means you have not configured your security groups properly. In this particular case, I have allowed all traffic to and from my EC2 instance. But try to avoid this approach and allow access only to specific IP addresses.
 
-Now test your server out locally by running the `mlflow run` command that will parse the `MLProject` file. If your run is successful, All your artifacts and metrics will be stored in the bucket and database. You'll be able to access this information from mlflow dashboard running on the tracking server.
+Now test your server out locally by running the `MLflow run` command that will parse the `MLProject` file. If your run is successful, All your artifacts and metrics will be stored in the bucket and database. You'll be able to access this information from MLflow dashboard running on the tracking server.
 
 
 
 ## 2. Containerizing the source code for training on SageMaker
 
-AWS Sagemaker is a well-equipped tool when it comes to end-to-end machine learning. Most often ML engineers will be using Sagemaker's Built-in Algorithms on their custom datasets. But SageMaker also provides us with a way to bring our own model. To execute our custom training scripts, SageMaker provides us a script mode where we can train our model in a container. Frameworks such as TensorFlow, PyTorch, MXNet, etc. are provided in these containers. But sometimes we may need additional dependencies which may not be available like mlflow, for instance. Therefore we bring in our own container.
+AWS Sagemaker is a well-equipped tool when it comes to end-to-end machine learning. Most often ML engineers will be using Sagemaker's Built-in Algorithms on their custom datasets. But SageMaker also provides us with a way to bring our own model. To execute our custom training scripts, SageMaker provides us a script mode where we can train our model in a container. Frameworks such as TensorFlow, PyTorch, MXNet, etc. are provided in these containers. But sometimes we may need additional dependencies which may not be available like MLflow, for instance. Therefore we bring in our own container.
 
 In this section, we will go through how to create this custom container and how to push our image to ECR.
 
@@ -58,14 +58,14 @@ ENV MLFLOW_TRACKING_URI=http://ec2-13-232-139-2.ap-south-1.compute.amazonaws.com
 ENV MLFLOW_EXP_NAME=Experiment-abhishek
 ```
 
-We set these env variables to let mlflow know the tracking server URI and the name of our experiments, we had already created our tracking server in the first section.
+We set these env variables to let MLflow know the tracking server URI and the name of our experiments, we had already created our tracking server in the first section.
 
 
 `train` is the training script which is called by SageMaker. 
 ```
 RUN chmod +x train
 ```
-Make sure to make this script executable otherwise SageMaker won't be able to run it. This training script takes some parameters that will be passed from the SageMaker notebook instance. Two of the parameters are already set using env variables. The tracking server URI and the experiment name. I have added these two just in case if we do want to change. I'm setting the values using mlflow API. You can check the code. This approach brings in the flexibility we need.
+Make sure to make this script executable otherwise SageMaker won't be able to run it. This training script takes some parameters that will be passed from the SageMaker notebook instance. Two of the parameters are already set using env variables. The tracking server URI and the experiment name. I have added these two just in case if we do want to change. I'm setting the values using MLflow API. You can check the code. This approach brings in the flexibility we need.
 
 Now that our Dockerfile is set, all we need to do is build and push our image to AWS ECR so that it can be accessed by SageMaker.
 
@@ -111,7 +111,7 @@ Now in this case. I copied the dataset inside a container since it wasn't too bi
 If you check the contents of your S3 bucket, You'll see that the model artifacts will be saved. You can find the URI to your preferred model on the dashboard of your MLflow tracking server. For example, `s3://mlflow-data-asp/20/8ef449c9af5243e3957d12cd4813b948/artifacts/`. This is a location to the `MLModel` file which has all the information about the model.
 
 
-By calling `mlflow.sagemaker.deploy()` or using `mlflow sagemaker` CLI you can create an endpoint in sagemaker. I am calling this method in [sagemaker_deploy.py](sagemaker_deploy.py) script.
+By calling `mlflow.sagemaker.deploy()` or using `MLflow sagemaker` CLI you can create an endpoint in sagemaker. I am calling this method in [sagemaker_deploy.py](sagemaker_deploy.py) script.
 
 To run the script,
 
@@ -122,5 +122,5 @@ This process will take some time. Once done, you'll be able to see your endpoint
 `python send_request.py --sm-endpoint model-abhi1 --path dog.jpg`
 
 
-In hindsight, I would have to say that the training with your own container makes things unnecessarily complicated. It would be better to use a pre-built container. But the deployment is quite easy and quick to deal with. Still, the endpoint is taking an array as input. I have yet to explore how to perform pre-processing and post-processing to a SageMaker endpoint. But it is possible to set up an AWS Lambda function that takes the raw image input, performs the pre-processing on the image, and invokes the endpoint.
+In hindsight, I would have to say that the training with your own container makes things quite complicated. It would be better to use a pre-built container. But the deployment is easy and quick using MLflow SageMaker. Still, the endpoint is taking an array as input. I have yet to explore how to perform pre-processing and post-processing to a SageMaker endpoint. But it is possible to set up an AWS Lambda function that takes the raw image input, performs the pre-processing on the image, and invokes the endpoint.
 
