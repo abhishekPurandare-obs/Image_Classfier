@@ -108,5 +108,21 @@ Now in this case. I copied the dataset inside a container since it wasn't too bi
 
 ## 4. Creating an endpoint using MLflow SageMaker API
 
+If you check the contents of your S3 bucket, You'll see that the model artifacts will be saved. You can find the URI to your preferred model on the dashboard of your MLflow tracking server. For example, `s3://mlflow-data-asp/20/8ef449c9af5243e3957d12cd4813b948/artifacts/`. This is a location to the `MLModel` file which has all the information about the model.
 
+
+By calling `mlflow.sagemaker.deploy()` or using `mlflow sagemaker` CLI you can create an endpoint in sagemaker. I am calling this method in [sagemaker_deploy.py](sagemaker_deploy.py) script.
+
+To run the script,
+
+`python sagemaker_deploy.py --app-name model-abhi1 --model-uri s3://mlflow-data-asp/20/8ef449c9af5243e3957d12cd4813b948/artifacts/`
+
+This process will take some time. Once done, you'll be able to see your endpoint with `InService` status on the AWS SageMaker console. Copy the URL for invoking the model or you can use `boto3` to access sagemaker as shown in the `send_sagemaker()` method in [send_request.py](send_request.py).
+
+`python send_request.py --sm-endpoint model-abhi1 --path dog.jpg`
+
+
+# The Bottom Line
+
+In hindsight, I would have to say that the training with your own container makes things unnecessarily complicated. It would be better to use a pre-built container. But the deployment is quite easy and quick to deal with. Still, the endpoint is taking an array as input. I have yet to explore how to perform pre-processing and post-processing to a SageMaker endpoint. But it is possible to set up an AWS Lambda function that takes the raw image input, performs the pre-processing on the image, and invokes the endpoint.
 

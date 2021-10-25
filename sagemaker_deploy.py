@@ -1,7 +1,7 @@
 import mlflow
 import mlflow.sagemaker
 import click
-
+# python sagemaker_deploy.py --app-name model-abhi1 --model-uri s3://mlflow-data-asp/20/8ef449c9af5243e3957d12cd4813b948/artifacts/
 @click.command()
 @click.option("--app-name", type=click.STRING)
 @click.option("--model-uri", type=click.STRING)
