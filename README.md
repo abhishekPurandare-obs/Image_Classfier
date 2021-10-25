@@ -122,7 +122,5 @@ This process will take some time. Once done, you'll be able to see your endpoint
 `python send_request.py --sm-endpoint model-abhi1 --path dog.jpg`
 
 
-# The Bottom Line
-
 In hindsight, I would have to say that the training with your own container makes things unnecessarily complicated. It would be better to use a pre-built container. But the deployment is quite easy and quick to deal with. Still, the endpoint is taking an array as input. I have yet to explore how to perform pre-processing and post-processing to a SageMaker endpoint. But it is possible to set up an AWS Lambda function that takes the raw image input, performs the pre-processing on the image, and invokes the endpoint.
 
